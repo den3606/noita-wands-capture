@@ -5,10 +5,11 @@
   "main": "./src/main.js",
   "scripts": {
     "start": "electron .",
+    "clean": "rm -rf ./tmp/images/*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Den",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^18.0.1"
   },

@@ -1,6 +1,15 @@
+const { executionAsyncResource } = require('async_hooks')
 const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const path = require('path')
+const cv = require('../lib/opencv4.5.5')
+
+const MIN_THRESHOLD = 0.70 // しきい値
+const MAX_THRESHOLD = 0.97 // しきい値
+const REFRESH_RATE = 500 // 更新頻度(ms)
+const IS_SAVE_CAPTURE_IMAGE = false // キャプチャ時の画像を`tmp/images/`に保存するか
+const TEMPLATE_IMAGE = './resources/images/template2.png' // 参考画像
+
 
 ipcRenderer.on('noita-screen-id', async (event, sourceId) => {
   try {
@@ -25,7 +34,7 @@ ipcRenderer.on('noita-screen-id', async (event, sourceId) => {
 
 function handleStream(stream) {
   // Create hidden video tag
-  var video = document.createElement('video');
+  const video = document.createElement('video');
   video.style.cssText = 'position:absolute;top:-10000px;left:-10000px;';
 
   // Event connected to stream
@@ -36,28 +45,64 @@ function handleStream(stream) {
 
     video.play();
 
-    canvas = document.createElement('canvas');
-    canvas.width = this.videoWidth;
-    canvas.height = this.videoHeight;
+    const execute = async () => {
+      srcCanvas = document.createElement('canvas');
+      srcCanvas.width = this.videoWidth;
+      srcCanvas.height = this.videoHeight;
 
-    const ctx = canvas.getContext('2d');
-    const previewAreaElement = document.getElementById("wands-preview-area")
+      const srcCtx = srcCanvas.getContext('2d');
 
-    setInterval(() => {
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const templateCanvas = document.createElement('canvas')
+      const templateCtx = templateCanvas.getContext('2d');
 
-      previewAreaElement.setAttribute("src", canvas.toDataURL('image/png'));
+      const img = await new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve(img)
+        img.onerror = (e) => reject(e)
+        const nativeImg = fs.readFileSync(TEMPLATE_IMAGE)
+        img.src = 'data:image/png;base64,' + nativeImg.toString('base64')
+      })
 
-      const imageFilePath = path.join(process.cwd(), '/tmp/images/', Date.now() + '.png');
-      const base64Data = canvas.toDataURL().split(',')[1];
+      templateCtx.drawImage(img, 0, 0);
+      const templateMat = cv.imread(templateCanvas);
 
-      // TODO: 削除オプションを付けたときに有効化する
-      // fs.writeFile(imageFilePath, base64Data, "base64", function (err) {
-      //   if (err) {
-      //     return console.log("error: " + err)
-      //   }
-      // });
-    }, 100)
+      const previewAreaElement = document.getElementById("wands-preview-area")
+      // 初期チェック
+      refresh(previewAreaElement, srcCanvas)
+
+      const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+      (async () => {
+        let errorCount = 0;
+        while (true) {
+          await sleep(REFRESH_RATE);
+          try {
+            srcCtx.drawImage(video, 0, 0, srcCanvas.width, srcCanvas.height);
+
+            const srcMat = cv.imread(srcCanvas);
+
+            let dst = new cv.Mat();
+            let mask = new cv.Mat();
+            cv.matchTemplate(srcMat, templateMat, dst, cv.TM_CCORR_NORMED, mask);
+            let result = cv.minMaxLoc(dst, mask);
+            console.table(result)
+            if (MIN_THRESHOLD < result.minVal && MAX_THRESHOLD < result.maxVal) {
+              refresh(previewAreaElement, srcCanvas)
+            }
+
+          } catch (e) {
+            console.log(e)
+            console.log(errorCount)
+            errorCount++
+            if (errorCount > 3) {
+              break
+            }
+          }
+        }
+        execute();
+      })();
+    }
+
+    execute();
 
     // TODO: ポーズボタンが押された時
     // video.pause();
@@ -71,6 +116,20 @@ function handleStream(stream) {
 
   video.srcObject = stream;
   document.body.appendChild(video);
+}
+
+function refresh(previewAreaElement, srcCanvas) {
+  previewAreaElement.setAttribute("src", srcCanvas.toDataURL('image/png'));
+
+  if (IS_SAVE_CAPTURE_IMAGE) {
+    const imageFilePath = path.join(process.cwd(), '/tmp/images/', Date.now() + '.png');
+    const base64Data = srcCanvas.toDataURL().split(',')[1];
+    fs.writeFile(imageFilePath, base64Data, "base64", function (err) {
+      if (err) {
+        return console.log("error: " + err)
+      }
+    });
+  }
 }
 
 

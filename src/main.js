@@ -1,6 +1,8 @@
 const { app, desktopCapturer, BrowserWindow } = require('electron')
 const path = require('path')
 
+app.disableHardwareAcceleration()
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -13,6 +15,9 @@ const createWindow = () => {
 
   mainWindow.loadFile('index.html')
 
+  if (app.isPackaged) {
+    mainWindow.removeMenu()
+  }
   return mainWindow;
 }
 
