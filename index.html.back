@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Hello World!</title>
+  </head>
+  <body>
+    <a id="download">Download</a>
+    <video id="video"></video>
+    <!-- <script>
+      const downloadLink = document.getElementById('download');
+      var handleSuccess = function(stream) {
+        const options = {mimeType: 'video/webm'};
+        const recordedChunks = [];
+        const mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder.ondataavailable = (e) => {
+          recordedChunks.push(e.data);
+        };
+        mediaRecorder.onstop = (e) => {
+          downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
+          downloadLink.download = 'video.webm';
+        };
+        mediaRecorder.start();
+      };
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+          .then(handleSuccess);
+    </script> -->
+
+
+    <!-- <img src="./sample/img/src.jpg">
+    <h1>Hello World!</h1>
+    We are using Node.js <span id="node-version"></span>,
+    Chromium <span id="chrome-version"></span>,
+    and Electron <span id="electron-version"></span>.
+    <h2>Hello OpenCV.js</h2>
+    <p id="status">OpenCV.js is loading...</p>
+    <div>
+      <div class="inputoutput">
+        <img id="imageSrc" alt="No Image" />
+        <img id="imageSrc2" alt="No Image" />
+        <div class="caption">imageSrc <input type="file" id="fileInput" name="file" /></div>
+        <div class="caption">imageSrc2<input type="file" id="fileInput2" name="file2" /></div>
+      </div>
+      <div class="inputoutput">
+        <canvas id="canvasOutput"></canvas>
+        <div class="caption">canvasOutput</div>
+      </div>
+    </div>
+    <button onclick="myFunction()">Click me</button>
+    <canvas id="canvasOutput"></canvas> -->
+    <!-- <script type="text/javascript">
+      const judgeMatching = (num) => {
+        if (0.99 < num) {
+            return true
+        }else{
+            return false
+        }
+      }
+  
+      let imgElement = document.getElementById('imageSrc');
+      let imgElement2 = document.getElementById('imageSrc2');
+      let inputElement = document.getElementById('fileInput');
+      let inputElement2 = document.getElementById('fileInput2');
+  
+      inputElement.addEventListener('change', (e) => {
+        imgElement.src = URL.createObjectURL(e.target.files[0]);
+      }, false);
+  
+      inputElement2.addEventListener('change', (e) => {
+        imgElement2.src = URL.createObjectURL(e.target.files[0]);
+      }, false);
+  
+      function myFunction() {
+        let src = cv.imread(imgElement);
+        let templ = cv.imread(imgElement2);
+        console.log(templ);
+        let dst = new cv.Mat();
+        let mask = new cv.Mat();
+        cv.matchTemplate(src, templ, dst, cv.TM_CCOEFF, mask);
+        let result = cv.minMaxLoc(dst, mask);
+        let maxPoint = result.maxLoc;
+        let hoge = judgeMatching(result.maxVal);
+        window.alert(hoge);
+        src.delete(); dst.delete(); mask.delete();
+      }
+  
+      function onOpenCvReady() {
+        document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+      }
+  
+    </script>
+    <script async src="https://docs.opencv.org/4.5.0/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script> -->
+    <script src="./renderer.js"></script>
+  </body>
+</html>
