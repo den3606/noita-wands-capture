@@ -1,7 +1,7 @@
-const { app, desktopCapturer, BrowserWindow } = require('electron')
-const path = require('path')
+const { app, desktopCapturer, BrowserWindow } = require('electron');
+const path = require('path');
 
-app.disableHardwareAcceleration()
+app.disableHardwareAcceleration();
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -11,12 +11,12 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       webSecurity: false,
     }
-  })
+  });
 
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('index.html');
 
   if (app.isPackaged) {
-    mainWindow.removeMenu()
+    mainWindow.removeMenu();
   }
   return mainWindow;
 }
@@ -29,15 +29,15 @@ app.whenReady().then(() => {
       const regex = new RegExp('Noita - *');
 
       if (regex.test(source.name)) {
-        mainWindow.webContents.send('noita-screen-id', source.id)
-        return
+        mainWindow.webContents.send('noita-screen-id', source.id);
+        return;
       }
     }
-  })
-})
+  });
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
-})
+});
