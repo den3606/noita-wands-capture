@@ -71,7 +71,7 @@ async function executeWandsCapture(event, video) {
     let mask = new cv.Mat();
     try {
       cv.matchTemplate(srcMat, templateMat, dst, cv.TM_CCORR_NORMED, mask);
-    } catch(e) {
+    } catch (e) {
       console.error(Date.now());
       console.error("opencvの比較でエラーが発生しました。判定をスキップします。");
       console.error(e);
@@ -91,7 +91,7 @@ async function subscribe(callback) {
       setTimeout(() => {
         const result = callback();
         if (!result.success) {
-           return reject("OpenCVの画像比較でエラーが発生しました。");
+          return reject("OpenCVの画像比較でエラーが発生しました。");
         }
 
         console.table(result.minMax);
