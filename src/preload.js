@@ -88,36 +88,34 @@ async function executeWandsCapture(event, video) {
 
 
 async function subscribe(callback) {
-  try {
-    const result = await new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const result = callback();
-        if (!result.isSuccess) {
-          return reject("OpenCVの画像比較でエラーが発生しました。");
-        }
+  while (true) {
+    try {
+      const result = await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const result = callback();
+          if (!result.isSuccess) {
+            return reject("OpenCVの画像比較でエラーが発生しました。");
+          }
 
-        console.table(result.minMax);
-        if (MAX_THRESHOLD < result.minMax.maxVal) {
-          return resolve({ isWandsScene: true, srcCanvas: result.srcCanvas })
-        } else {
-          return resolve({ isWandsScene: false, srcCanvas: result.srcCanvas })
-        }
-      }, WAIT_TIME);
-    });
+          console.table(result.minMax);
+          if (MAX_THRESHOLD < result.minMax.maxVal) {
+            return resolve({ isWandsScene: true, srcCanvas: result.srcCanvas })
+          } else {
+            return resolve({ isWandsScene: false, srcCanvas: result.srcCanvas })
+          }
+        }, WAIT_TIME);
+      });
 
-    if (result.isWandsScene) {
-      refreshDisplay(result.srcCanvas);
-      saveCanvasImage(result.srcCanvas);
-      await subscribe(callback);
-    } else {
-      await subscribe(callback);
-    }
-  } catch (err) {
-    console.error("想定外のエラーが発生しました、一秒後再実行します");
-    console.error(err);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    await subscribe(callback);
-  };
+      if (result.isWandsScene) {
+        refreshDisplay(result.srcCanvas);
+        saveCanvasImage(result.srcCanvas);
+      }
+    } catch (err) {
+      console.error("想定外のエラーが発生しました、一秒後再実行します");
+      console.error(err);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    };
+  }
 }
 
 
