@@ -6,7 +6,7 @@ const cv = require('../lib/opencv4.5.5');
 const MAX_THRESHOLD = 0.971; // しきい値
 const WAIT_TIME = 500; // 更新間隔
 const IS_SAVE_CAPTURE_IMAGE = true; // キャプチャ時の画像を`tmp/images/`に保存するか
-const TEMPLATE_IMAGE = './resources/images/template2.png'; // 参考画像
+const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/template2.png'); // 参考画像
 
 
 ipcRenderer.on('noita-screen-id', async (event, sourceId) => {
