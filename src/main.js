@@ -17,6 +17,8 @@ const createWindow = () => {
 
   if (app.isPackaged) {
     mainWindow.removeMenu();
+  } else {
+    mainWindow.webContents.openDevTools();
   }
   return mainWindow;
 }
