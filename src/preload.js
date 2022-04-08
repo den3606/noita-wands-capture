@@ -69,18 +69,20 @@ async function executeWandsCapture(event, video) {
     const srcMat = cv.imread(srcCanvas);
     let dst = new cv.Mat();
     let mask = new cv.Mat();
+
+    const deleteMats = (...mats) => mats.forEach(mat => mat.delete());
+
     try {
       cv.matchTemplate(srcMat, templateMat, dst, cv.TM_CCORR_NORMED, mask);
     } catch (e) {
-      console.error(Date.now());
       console.error("opencvの比較でエラーが発生しました。判定をスキップします。");
       console.error(e);
-      saveCanvasImage(templateCanvas);
-      saveCanvasImage(srcCanvas);
-      video.pa
-      return { success: false };
+      deleteMats(dst, mask, templateMat, srcMat);
+      return { isSuccess: false };
     }
-    return { success: true, minMax: cv.minMaxLoc(dst, mask), srcCanvas: srcCanvas };
+    const minMax = cv.minMaxLoc(dst, mask);
+    deleteMats(dst, mask, templateMat, srcMat);
+    return { isSuccess: true, minMax: minMax, srcCanvas: srcCanvas };
   });
 }
 
@@ -90,7 +92,7 @@ async function subscribe(callback) {
     const result = await new Promise((resolve, reject) => {
       setTimeout(() => {
         const result = callback();
-        if (!result.success) {
+        if (!result.isSuccess) {
           return reject("OpenCVの画像比較でエラーが発生しました。");
         }
 
