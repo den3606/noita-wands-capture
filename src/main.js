@@ -13,7 +13,7 @@ const createWindow = () => {
     }
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   if (app.isPackaged) {
     mainWindow.removeMenu();
