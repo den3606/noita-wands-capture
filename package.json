@@ -11,9 +11,33 @@
   "author": "Den",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^18.0.1"
+    "electron": "^18.0.1",
+    "electron-builder": "^22.14.13"
   },
   "dependencies": {
     "data-uri-to-buffer": "^4.0.0"
+  },
+  "build": {
+    "appId": "com.electron.noita-wands-capture",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "assets",
+      "lib",
+      "resources",
+      "src",
+      "tmp",
+      "package.json",
+      "package-lock.json"
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": "nsis"
+    },
+    "nsis":{
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
