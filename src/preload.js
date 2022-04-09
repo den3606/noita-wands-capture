@@ -135,6 +135,8 @@ function createCanvas(source, width = null, height = null) {
 
 function refreshDisplay(canvas) {
   const previewAreaElement = document.getElementById("wands-preview-area");
+  previewAreaElement.width = 1280;
+  previewAreaElement.height = 720;
   previewAreaElement.setAttribute("src", canvas.toDataURL('image/png'));
 }
 
