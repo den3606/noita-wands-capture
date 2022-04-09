@@ -6,7 +6,10 @@ const cv = require('../lib/opencv4.5.5');
 const MAX_THRESHOLD = 0.971; // しきい値
 const WAIT_TIME = 500; // 更新間隔
 const IS_SAVE_CAPTURE_IMAGE = true; // キャプチャ時の画像を`tmp/images/`に保存するか
-const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/720p/template2.png'); // 参考画像
+const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/1080p/template2.png'); // 参考画像
+const DISPLAY_WIDTH = 1280;
+const DISPLAY_HEIGHT = 720;
+
 
 ipcRenderer.on('noita-screen-id', async (event, sourceId) => {
   try {
@@ -38,8 +41,8 @@ function handleStream(stream) {
   video.style.cssText = 'position:absolute;top:-10000px;left:-10000px;';
 
   video.onloadedmetadata = (event) => {
-    video.style.height = this.videoHeight + 'px';
-    video.style.width = this.videoWidth + 'px';
+    video.style.height = `${DISPLAY_HEIGHT}px`;
+    video.style.width = `${DISPLAY_WIDTH}px`;
     executeWandsCapture(event, video);
   }
 
@@ -106,7 +109,7 @@ async function subscribe(callback) {
       });
 
       if (result.isWandsScene) {
-        refreshDisplay(result.srcCanvas);
+        updateDisplay(result.srcCanvas);
         saveCanvasImage(result.srcCanvas);
       }
     } catch (err) {
@@ -133,10 +136,10 @@ function createCanvas(source, width = null, height = null) {
 }
 
 
-function refreshDisplay(canvas) {
+function updateDisplay(canvas) {
   const previewAreaElement = document.getElementById("wands-preview-area");
-  previewAreaElement.width = 1280;
-  previewAreaElement.height = 720;
+  previewAreaElement.width = DISPLAY_WIDTH;
+  previewAreaElement.height = DISPLAY_HEIGHT;
   previewAreaElement.setAttribute("src", canvas.toDataURL('image/png'));
 }
 

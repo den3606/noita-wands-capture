@@ -23,16 +23,13 @@
       "output": "dist"
     },
     "files": [
-      "assets",
-      "lib",
-      "resources",
-      "src",
+      "app",
       "tmp",
       "package.json",
       "package-lock.json"
     ],
     "win": {
-      "icon": "assets/icon.ico",
+      "icon": "app/assets/icon.ico",
       "target": "nsis"
     },
     "nsis":{
