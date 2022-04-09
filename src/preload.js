@@ -6,7 +6,7 @@ const cv = require('../lib/opencv4.5.5');
 const MAX_THRESHOLD = 0.971; // しきい値
 const WAIT_TIME = 500; // 更新間隔
 const IS_SAVE_CAPTURE_IMAGE = true; // キャプチャ時の画像を`tmp/images/`に保存するか
-const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/template7.png'); // 参考画像
+const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/720p/template2.png'); // 参考画像
 
 ipcRenderer.on('noita-screen-id', async (event, sourceId) => {
   try {
@@ -139,10 +139,19 @@ function refreshDisplay(canvas) {
 }
 
 function saveCanvasImage(canvas) {
+  const tmpImagePath = path.join(__dirname, '../tmp/images')
   if (IS_SAVE_CAPTURE_IMAGE) {
-    const imageFilePath = path.join(process.cwd(), '/tmp/images/', Date.now() + '.png');
+    if (!fs.existsSync(tmpImagePath)) {
+      fs.mkdir(tmpImagePath, (err) => {
+        if (err) {
+          console.log(err.toString());
+          return;
+        }
+      });
+    }
+    const imageFile = Date.now() + '.png';
     const base64Data = canvas.toDataURL().split(',')[1];
-    fs.writeFile(imageFilePath, base64Data, "base64", function (err) {
+    fs.writeFile(path.join(tmpImagePath, imageFile), base64Data, "base64", function (err) {
       if (err) {
         return console.error("error: " + err);
       }
