@@ -6,7 +6,7 @@ const cv = require('../lib/opencv4.5.5');
 const MAX_THRESHOLD = 0; // しきい値
 const WAIT_TIME = 500; // 更新間隔
 const IS_SAVE_CAPTURE_IMAGE = true; // キャプチャ時の画像を`tmp/images/`に保存するか
-const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/1080p/template2.png'); // 参考画像
+const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/720p/template3.png'); // 参考画像
 const DISPLAY_WIDTH = 1280;
 const DISPLAY_HEIGHT = 720;
 
@@ -28,7 +28,7 @@ ipcRenderer.on('main-window-ready', (event) => {
     canCapture = false;
   });
 
-  console.info("画面の準備が完了しました")
+  console.info("画面の準備が完了しました");
 });
 
 async function startNoitaCapture(sourceId) {
@@ -104,6 +104,11 @@ async function executeWandsCapture(event, video) {
       return { isSuccess: false };
     }
     const minMax = cv.minMaxLoc(dst, mask);
+    let maxPoint = minMax.maxLoc;
+    let color = new cv.Scalar(255, 0, 0, 255);
+    let point = new cv.Point(maxPoint.x + templateMat.cols, maxPoint.y + templateMat.rows);
+    cv.rectangle(srcMat, maxPoint, point, color, 2, cv.LINE_8, 0);
+    cv.imshow(srcCanvas, srcMat);
     deleteMats(dst, mask, templateMat, srcMat);
     return { isSuccess: true, minMax: minMax, srcCanvas: srcCanvas };
   });
