@@ -10,18 +10,22 @@ const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/1080p/template2
 const DISPLAY_WIDTH = 1280;
 const DISPLAY_HEIGHT = 720;
 
+let canCapture = true;
 
 ipcRenderer.on('main-window-ready', (event) => {
-  const startElement = document.querySelector("#start");
-
-  startElement.addEventListener("click", async () => {
+  document.querySelector("#start").addEventListener("click", async () => {
+    canCapture = true;
     const sourceId = await ipcRenderer.invoke('find-noita-screen-id');
-    console.log(sourceId)
+    console.log(sourceId);
     if (sourceId == null) {
       console.error("Noitaの画面を取得できませんでした");
     } else {
       await startNoitaCapture(sourceId);
     }
+  });
+
+  document.querySelector("#stop").addEventListener("click", async () => {
+    canCapture = false;
   });
 
   console.info("画面の準備が完了しました")
@@ -107,7 +111,7 @@ async function executeWandsCapture(event, video) {
 
 
 async function subscribe(callback) {
-  while (true) {
+  while (canCapture) {
     try {
       const result = await new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -179,14 +183,3 @@ function saveCanvasImage(canvas) {
     });
   }
 }
-
-
-
-  // TODO: ポーズボタンが押された時
-  // video.pause();
-
-  // TODO: 停止ボタンが押されたときに実装する
-  // try {
-  //   // Destroy connect to stream
-  //   stream.getTracks()[0].stop();
-  // } catch (e) { }
