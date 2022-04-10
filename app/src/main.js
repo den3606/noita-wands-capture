@@ -1,4 +1,4 @@
-const { app, desktopCapturer, BrowserWindow } = require('electron');
+const { app, desktopCapturer, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 app.disableHardwareAcceleration();
@@ -25,18 +25,19 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
   const mainWindow = createWindow();
+  mainWindow.webContents.send('main-window-ready');
+});
 
-  desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
+ipcMain.handle('find-noita-screen-id', async (event) => {
+  return await desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
     for (const source of sources) {
-      const regex = new RegExp('Noita - *');
-
-      if (regex.test(source.name)) {
-        mainWindow.webContents.send('noita-screen-id', source.id);
-        return;
+      if ((new RegExp('Noita - *')).test(source.name)) {
+        return source.id;
       }
     }
+    return null;
   });
-});
+})
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

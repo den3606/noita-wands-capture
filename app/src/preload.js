@@ -1,9 +1,9 @@
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, desktopCapturer } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const cv = require('../lib/opencv4.5.5');
 
-const MAX_THRESHOLD = 0.971; // しきい値
+const MAX_THRESHOLD = 0; // しきい値
 const WAIT_TIME = 500; // 更新間隔
 const IS_SAVE_CAPTURE_IMAGE = true; // キャプチャ時の画像を`tmp/images/`に保存するか
 const TEMPLATE_IMAGE = path.join(__dirname, '../resources/images/1080p/template2.png'); // 参考画像
@@ -11,7 +11,24 @@ const DISPLAY_WIDTH = 1280;
 const DISPLAY_HEIGHT = 720;
 
 
-ipcRenderer.on('noita-screen-id', async (event, sourceId) => {
+ipcRenderer.on('main-window-ready', (event) => {
+  const startElement = document.querySelector("#start");
+
+  startElement.addEventListener("click", async () => {
+    const sourceId = await ipcRenderer.invoke('find-noita-screen-id');
+    console.log(sourceId)
+    if (sourceId == null) {
+      console.error("Noitaの画面を取得できませんでした");
+    } else {
+      await startNoitaCapture(sourceId);
+    }
+  });
+
+  console.info("画面の準備が完了しました")
+});
+
+async function startNoitaCapture(sourceId) {
+  console.log(sourceId);
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
@@ -33,10 +50,10 @@ ipcRenderer.on('noita-screen-id', async (event, sourceId) => {
     console.error("❌画面のキャプチャに失敗しました");
     handleError(e);
   }
-});
+}
 
 function handleStream(stream) {
-
+  console.log(stream);
   const video = document.createElement('video');
   video.style.cssText = 'position:absolute;top:-10000px;left:-10000px;';
 
@@ -138,13 +155,12 @@ function createCanvas(source, width = null, height = null) {
 
 function updateDisplay(canvas) {
   const previewAreaElement = document.getElementById("wands-preview-area");
-  previewAreaElement.width = DISPLAY_WIDTH;
-  previewAreaElement.height = DISPLAY_HEIGHT;
+  previewAreaElement.style.width = "100%";
   previewAreaElement.setAttribute("src", canvas.toDataURL('image/png'));
 }
 
 function saveCanvasImage(canvas) {
-  const tmpImagePath = path.join(__dirname, '../tmp/images')
+  const tmpImagePath = path.join(__dirname, '../../tmp/images')
   if (IS_SAVE_CAPTURE_IMAGE) {
     if (!fs.existsSync(tmpImagePath)) {
       fs.mkdir(tmpImagePath, (err) => {

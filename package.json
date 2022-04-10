@@ -2,20 +2,18 @@
   "name": "wands-info",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/main.js",
+  "main": "./app/src/main.js",
+  "author": "Den",
+  "license": "MIT",
   "scripts": {
     "start": "electron .",
     "clean": "rm -rf ./tmp/images/*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Den",
-  "license": "MIT",
   "devDependencies": {
     "electron": "^18.0.1",
-    "electron-builder": "^22.14.13"
-  },
-  "dependencies": {
-    "data-uri-to-buffer": "^4.0.0"
+    "electron-builder": "^22.14.13",
+    "bootstrap": "^5.1.3"
   },
   "build": {
     "appId": "com.electron.noita-wands-capture",
@@ -32,9 +30,12 @@
       "icon": "app/assets/icon.ico",
       "target": "nsis"
     },
-    "nsis":{
+    "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1"
   }
 }
